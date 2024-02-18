@@ -1,22 +1,22 @@
 pub struct Rectangle {
-    x: f64,
-    y: f64,
+    x: u16,
+    y: u16,
 }
 
 impl Rectangle {
-    pub fn new(x: f64, y: f64) -> Rectangle {
+    pub fn new(x: u16, y: u16) -> Rectangle {
         Rectangle {
             x: x,
             y: y
         }
     }
     
-    fn area(&self) -> f64 {
+    fn area(&self) -> u16 {
         self.x * self.y
     }
 
-    fn perimeter(&self) -> f64 {
-        2. * (self.x + self.y)
+    fn perimeter(&self) -> u16 {
+        2 * (self.x + self.y)
     }
 
     pub fn print_info(&self) {

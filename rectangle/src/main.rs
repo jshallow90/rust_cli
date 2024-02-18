@@ -1,9 +1,12 @@
+mod args;
 mod rectangle;
 
-use std::env;
+use args::CLIArgs;
+use clap::Parser;
 use rectangle::Rectangle;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    dbg!(args);
+    let args = CLIArgs::parse();
+    let shape = Rectangle::new(args.width, args.length);
+    shape.print_info();
 }
