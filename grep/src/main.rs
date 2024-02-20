@@ -1,10 +1,20 @@
 mod grep_file;
+mod args;
+
+use args::Args;
+use clap::Parser;
+use grep_file::GrepFile;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    
-    let query = &args[1];
-    let file_path = &args[2];
+    let args = Args::parse();
+    let grep = GrepFile::new(args.search, args.file);
 
-    search_in_file(query, file_path);
+    grep.findall()
+        .expect("ERROR: process failed");
+
+    // NEXT STEPS:
+    // 2. add case insensitivty
+    // 3. return value for no match found
+    // 4. add pipe grep option
+
 }
