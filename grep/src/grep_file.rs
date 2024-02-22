@@ -1,7 +1,7 @@
 use colored::Colorize;
 use regex::{Captures, Regex};
 use std::fs::File;
-use std::io::{BufRead, BufReader, Error};
+use std::io::{BufRead, BufReader};
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -18,7 +18,7 @@ impl GrepFile {
         }
     }
 
-    pub fn findall(&self) -> Result<(), Error> {
+    pub fn findall(&self) -> bool {
         println!("Searching for {} in file {}", self.search, self.file);
 
         let file = File::open(&self.file)
@@ -28,17 +28,19 @@ impl GrepFile {
 
         let search = format!(r"({})", &self.search);
         let re: Regex = Regex::new(&search).unwrap();
+        let mut found = false;
         
         let buffer = BufReader::new(file);
         for line in buffer.lines() {
-            let line = line?;
+            let line = line.unwrap();
             if re.is_match(&line) {
+                found = true;
                 let line = re.replace_all(&line, |caps: &Captures| {
                     format!("{}", &caps[1].green())
                 });
                 println!("{}", line);
             }
         }
-        Ok(())
+        found
     }
 }

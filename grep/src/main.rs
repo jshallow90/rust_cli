@@ -9,12 +9,10 @@ fn main() {
     let args = Args::parse();
     let grep = GrepFile::new(args.search, args.file);
 
-    grep.findall()
-        .expect("ERROR: process failed");
-
+    let result = if grep.findall() { 0 } else { 1 };
+    std::process::exit(result)
     // NEXT STEPS:
     // 2. add case insensitivty
-    // 3. return value for no match found
     // 4. add pipe grep option
 
 }
