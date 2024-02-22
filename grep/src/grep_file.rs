@@ -1,25 +1,29 @@
 use colored::Colorize;
-use regex::{Captures, Regex};
+use regex::{Captures, RegexBuilder};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+
+use crate::args::Args;
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct GrepFile {
     search: String,
     file: String,
+    case_insensitive: bool,
 }
 
 impl GrepFile {
-    pub fn new(search: String, file: String) -> GrepFile {
+    pub fn new(args: Args) -> Self{
         GrepFile {
-            search: search,
-            file: file,
+            search: args.search,
+            file: args.file,
+            case_insensitive: args.case_insensitive
         }
     }
 
     pub fn findall(&self) -> bool {
-        println!("Searching for {} in file {}", self.search, self.file);
+        println!("Searching for {} in file {} with arg {}", self.search, self.file, self.case_insensitive);
 
         let file = File::open(&self.file)
             .expect(format!("{}: file {} does not exists", 
@@ -27,7 +31,10 @@ impl GrepFile {
                 self.file).as_str());
 
         let search = format!(r"({})", &self.search);
-        let re: Regex = Regex::new(&search).unwrap();
+        let re = RegexBuilder::new(&search)
+            .case_insensitive(self.case_insensitive)
+            .build()
+            .expect("Invalid Regex");
         let mut found = false;
         
         let buffer = BufReader::new(file);
