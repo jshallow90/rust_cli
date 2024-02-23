@@ -1,33 +1,23 @@
 use colored::Colorize;
 use regex::{Captures, RegexBuilder};
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::stdin;
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct GrepFile {
+pub struct GrepPipe {
     search: String,
-    file: String,
     case_insensitive: bool,
 }
 
-impl GrepFile {
-    pub fn new(search: &String, file: &String, case_insensitive: bool) -> Self{
-        GrepFile {
+impl GrepPipe {
+    pub fn new(search: &String, case_insensitive: bool) -> Self{
+        GrepPipe {
             search: search.to_string(),
-            file: file.to_string(),
             case_insensitive: case_insensitive
         }
     }
 
     pub fn findall(&self) -> bool {
-        println!("Searching for {} in file {} with arg {}", self.search, self.file, self.case_insensitive);
-
-        let file = File::open(&self.file)
-            .expect(format!("{}: file {} does not exists", 
-                "ERROR".red(),
-                self.file).as_str());
-
         let search = format!(r"({})", &self.search);
         let re = RegexBuilder::new(&search)
             .case_insensitive(self.case_insensitive)
@@ -35,8 +25,12 @@ impl GrepFile {
             .expect("Invalid Regex");
         let mut found = false;
         
-        let buffer = BufReader::new(file);
-        for line in buffer.lines() {
+        // let mut buffer = String::new();
+        // stdin().read_line(&mut buffer).unwrap();
+        
+        
+        let lines = stdin().lines();
+        for line in lines {
             let line = line.unwrap();
             if re.is_match(&line) {
                 found = true;
