@@ -25,10 +25,6 @@ impl GrepPipe {
             .expect("Invalid Regex");
         let mut found = false;
         
-        // let mut buffer = String::new();
-        // stdin().read_line(&mut buffer).unwrap();
-        
-        
         let lines = stdin().lines();
         for line in lines {
             let line = line.unwrap();
