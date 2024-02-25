@@ -1,41 +1,54 @@
 use colored::Colorize;
-use regex::{Captures, RegexBuilder};
+use regex::{Captures, Regex, RegexBuilder};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
+use crate::args::ArgOptions;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+
 pub struct GrepFile {
-    search: String,
-    file: String,
-    case_insensitive: bool,
+    args: ArgOptions
 }
 
 impl GrepFile {
-    pub fn new(search: &String, file: &String, case_insensitive: bool) -> Self{
+    pub fn new(args: ArgOptions) -> Self{
         GrepFile {
-            search: search.to_string(),
-            file: file.to_string(),
-            case_insensitive: case_insensitive
+            args: args
         }
     }
 
-    pub fn findall(&self) -> bool {
-        println!("Searching for {} in file {} with arg {}", self.search, self.file, self.case_insensitive);
-
-        let file = File::open(&self.file)
-            .expect(format!("{}: file {} does not exists", 
-                "ERROR".red(),
-                self.file).as_str());
-
-        let search = format!(r"({})", &self.search);
+    pub fn find_all(&self) -> bool {
+        let search = format!(r"({})", &self.args.search);
         let re = RegexBuilder::new(&search)
-            .case_insensitive(self.case_insensitive)
+            .case_insensitive(self.args.case_insensitive)
             .build()
             .expect("Invalid Regex");
+        
         let mut found = false;
         
-        let buffer = BufReader::new(file);
+        for file in &self.args.files {
+            let result = self.find_in_file(&file, &re);
+            if ! found && result {
+                found = true
+            }
+        }
+        found
+    }
+
+    fn find_in_file(&self, file: &String, re: &Regex) -> bool {
+        let f = File::open(&file)
+            .expect(format!("{}: file {} does not exists", 
+                "ERROR".red(),
+                file).as_str());
+
+        let mut found = false;
+        let file_out = if self.args.files.len() > 1 {
+            format!("{}", file.purple())
+        } else {
+            "".to_string()
+        };
+        
+        let buffer = BufReader::new(f);
         for line in buffer.lines() {
             let line = line.unwrap();
             if re.is_match(&line) {
@@ -43,7 +56,7 @@ impl GrepFile {
                 let line = re.replace_all(&line, |caps: &Captures| {
                     format!("{}", &caps[1].green())
                 });
-                println!("{}", line);
+                println!("{}:{}", file_out, line);
             }
         }
         found
