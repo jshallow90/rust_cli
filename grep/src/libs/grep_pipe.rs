@@ -2,25 +2,24 @@ use colored::Colorize;
 use regex::{Captures, RegexBuilder};
 use std::io::stdin;
 
+use crate::libs::args::ArgOptions;
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+
 pub struct GrepPipe {
-    search: String,
-    case_insensitive: bool,
+    args: ArgOptions
 }
 
 impl GrepPipe {
-    pub fn new(search: &String, case_insensitive: bool) -> Self{
+    pub fn new(args: ArgOptions) -> Self{
         GrepPipe {
-            search: search.to_string(),
-            case_insensitive: case_insensitive
+            args: args
         }
     }
 
-    pub fn findall(&self) -> bool {
-        let search = format!(r"({})", &self.search);
+    pub fn find_all(&self) -> bool {
+        let search = format!(r"({})", &self.args.search);
         let re = RegexBuilder::new(&search)
-            .case_insensitive(self.case_insensitive)
+            .case_insensitive(self.args.case_insensitive)
             .build()
             .expect("Invalid Regex");
         let mut found = false;

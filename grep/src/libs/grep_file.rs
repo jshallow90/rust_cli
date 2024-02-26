@@ -3,7 +3,7 @@ use regex::{Captures, Regex, RegexBuilder};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-use crate::args::ArgOptions;
+use crate::libs::args::ArgOptions;
 
 
 pub struct GrepFile {
@@ -53,6 +53,11 @@ impl GrepFile {
             let line = line.unwrap();
             if re.is_match(&line) {
                 found = true;
+                if self.args.file_only {
+                    println!("{}", file_out);
+                    return found
+                }
+                
                 let line = re.replace_all(&line, |caps: &Captures| {
                     format!("{}", &caps[1].green())
                 });
