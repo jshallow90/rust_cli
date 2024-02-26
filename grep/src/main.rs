@@ -1,9 +1,6 @@
-mod libs;
-
 use atty::Stream;
-use libs::args::{ArgOptions, InputType};
-use libs::grep_file::GrepFile;
-use libs::grep_pipe::GrepPipe;
+use grep::args::{ArgOptions, InputType};
+use grep::grep::{GrepFile, GrepPipe};
 use std::env;
 
 
@@ -29,6 +26,7 @@ fn main() {
     std::process::exit(exit_code)
         
     // NEXT STEPS:
-    // 7. add test cases
+    // 7. add test cases for grep
+    // 8. add recursive grep
 
 }
