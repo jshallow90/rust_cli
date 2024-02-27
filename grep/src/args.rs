@@ -1,3 +1,5 @@
+use regex::{Regex, RegexBuilder};
+
 
 #[derive(Debug, PartialEq)]
 pub enum InputType {
@@ -7,9 +9,8 @@ pub enum InputType {
 
 pub struct ArgOptions {
     pub input_type: InputType,
-    pub case_insensitive: bool,
     pub file_only: bool,
-    pub search: String,
+    pub re: Regex,
     pub files: Vec<String>
 }
 
@@ -51,21 +52,23 @@ impl ArgOptions {
             }
         }
 
-        let search = &pos_args[0];
+        let re = RegexBuilder::new(&pos_args[0])
+            .case_insensitive(case_insensitive)
+            .build()
+            .expect("Invalid Regex");
+        
         match input_type {
             InputType::File => ArgOptions {
                 input_type: InputType::File,
-                case_insensitive: case_insensitive,
                 file_only: file_only,
-                search: search.to_owned(),
+                re: re,
                 files: pos_args[1..].to_owned()
             },
             InputType::Pipe => ArgOptions {
                 input_type: InputType::Pipe,
-                case_insensitive: case_insensitive,
                 file_only: false,
-                search: search.to_owned(),
-                files: Vec::new() 
+                re: re,
+                files: Vec::new()
             }
         }
 
@@ -74,6 +77,6 @@ impl ArgOptions {
     fn help() {
         println!("Grep command to search in files\n");
         println!("Usage: grep [OPT] search_string file_name\n");
-        println!("Valid values for [opt] are:\n\t-i = case insensitive search\n");
+        println!("Valid values for [opt] are:\n\t-i = case insensitive search\n\t-l = list files only\n");
     }
 }

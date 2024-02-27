@@ -2,6 +2,7 @@
 mod test_args {
     use grep::args::ArgOptions;
     use grep::args::InputType;
+    use regex::RegexBuilder;
     
     #[test]
     fn file_named_args() {
@@ -12,10 +13,13 @@ mod test_args {
         args.push(String::from("test_file.txt"));
         
         let arg_opts = ArgOptions::new(args, InputType::File);
-        assert_eq!(arg_opts.case_insensitive, true);
+        let re = RegexBuilder::new("t.*T")
+            .build()
+            .expect("Invalid Regex");
+        
         assert_eq!(arg_opts.file_only, true);
         assert_eq!(arg_opts.files, ["test_file.txt"]);
-        assert_eq!(arg_opts.search, "t.*T");
+        assert_eq!(arg_opts.re.as_str(), re.as_str());
         assert_eq!(arg_opts.input_type, InputType::File);
     }
 
@@ -27,10 +31,13 @@ mod test_args {
         args.push(String::from("t.*T"));
         
         let arg_opts = ArgOptions::new(args, InputType::Pipe);
-        assert_eq!(arg_opts.case_insensitive, true);
+        let re = RegexBuilder::new("t.*T")
+            .build()
+            .expect("Invalid Regex");
+        
         assert_eq!(arg_opts.file_only, false);
         assert_eq!(arg_opts.files, Vec::<String>::new());
-        assert_eq!(arg_opts.search, "t.*T");
+        assert_eq!(arg_opts.re.as_str(), re.as_str());
         assert_eq!(arg_opts.input_type, InputType::Pipe);
     }
 
@@ -42,10 +49,7 @@ mod test_args {
         args.push(String::from("test_file2.txt"));
         
         let arg_opts = ArgOptions::new(args, InputType::File);
-        assert_eq!(arg_opts.case_insensitive, false);
-        assert_eq!(arg_opts.file_only, false);
         assert_eq!(arg_opts.files, ["test_file.txt", "test_file2.txt"]);
-        assert_eq!(arg_opts.search, "t.*T")
     }
 
     #[test]
@@ -57,9 +61,13 @@ mod test_args {
         args.push(String::from("test_file2.txt"));
         
         let arg_opts = ArgOptions::new(args, InputType::File);
-        assert_eq!(arg_opts.case_insensitive, true);
+        let re = RegexBuilder::new("t.*T")
+            .case_insensitive(true)
+            .build()
+            .expect("Invalid Regex");
+
+        assert_eq!(arg_opts.re.as_str(), re.as_str());
         assert_eq!(arg_opts.file_only, true);
         assert_eq!(arg_opts.files, ["test_file.txt", "test_file2.txt"]);
-        assert_eq!(arg_opts.search, "t.*T")
     }
 }
