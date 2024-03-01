@@ -20,6 +20,7 @@ impl GrepFile {
     pub fn find_all(&self) -> bool {       
         let mut found = false;
         
+        println!("Searching in files {:?}", self.args.files);
         for file in &self.args.files {
             let result = self.find_in_file(&file);
             if ! found && result {

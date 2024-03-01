@@ -26,7 +26,6 @@ fn main() {
     std::process::exit(exit_code)
         
     // NEXT STEPS:
-    // 7. add test cases for grep
     // 8. add recursive grep
 
 }
