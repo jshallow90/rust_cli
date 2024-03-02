@@ -24,8 +24,5 @@ fn main() {
     };
     
     std::process::exit(exit_code)
-        
-    // NEXT STEPS:
-    // 8. add recursive grep
 
 }
