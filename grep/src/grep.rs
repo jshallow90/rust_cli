@@ -1,5 +1,6 @@
 use colored::Colorize;
 use regex::Captures;
+use std::fmt::format;
 use std::fs::File;
 use std::io::{BufRead, BufReader, stdin};
 
@@ -45,18 +46,26 @@ impl GrepFile {
         
         let buffer = BufReader::new(f);
         for line in buffer.lines() {
-            let line = line.unwrap();
-            if self.args.re.is_match(&line) {
-                found = true;
-                if self.args.file_only {
-                    println!("{}", file_out);
-                    return found
+            
+            match line {
+                Ok(line) => {
+                    if self.args.re.is_match(&line) {
+                        found = true;
+                        if self.args.file_only {
+                            println!("{}", file_out);
+                            return found
+                        }
+                        
+                        let line = self.args.re.replace_all(&line, |caps: &Captures| {
+                            format!("{}", &caps[0].green())
+                        });
+                        println!("{}{}", file_out, line);
+                    }
+                },
+                Err(_) => {
+                    eprintln!("ERROR: file {:?} contained invalid UTF 8. skipping", file);
+                    return false
                 }
-                
-                let line = self.args.re.replace_all(&line, |caps: &Captures| {
-                    format!("{}", &caps[0].green())
-                });
-                println!("{}{}", file_out, line);
             }
         }
         found
